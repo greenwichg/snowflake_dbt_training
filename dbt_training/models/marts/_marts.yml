@@ -5,14 +5,40 @@ models:
     description: >
       Customer dimension: one row per customer with lifetime order metrics.
       Lifetime values count completed orders only, in USD.
+      Has an enforced DATA CONTRACT (Day 4): dbt verifies the model produces
+      exactly these columns and types before building it, so downstream
+      consumers can rely on the schema not drifting.
+    config:
+      contract:
+        enforced: true
     columns:
       - name: customer_id
         description: Primary key.
+        data_type: number
         tests:
           - unique
           - not_null
+      - name: first_name
+        data_type: varchar
+      - name: last_name
+        data_type: varchar
+      - name: email
+        data_type: varchar
+      - name: country_code
+        data_type: varchar
+      - name: signup_date
+        data_type: date
+      - name: is_active
+        data_type: boolean
+      - name: lifetime_orders
+        data_type: number
       - name: lifetime_value_usd
         description: Sum of completed order amounts in USD.
+        data_type: number
+      - name: first_order_date
+        data_type: date
+      - name: most_recent_order_date
+        data_type: date
 
   - name: fct_orders
     description: One row per order with customer attributes and order sequencing.
@@ -29,9 +55,11 @@ models:
                 field: customer_id
       - name: amount_usd
         tests:
+          - is_positive          # custom generic test (tests/generic/)
           - dbt_utils.accepted_range:
               arguments:
                 min_value: 0
+                max_value: 100000
 
   - name: fct_web_events
     description: Incremental fact of flattened web events, one row per event.

@@ -19,9 +19,16 @@ models:
     staging:
       # Staging: light cleanup of raw data; cheap views
       +materialized: view
+      # Day 5 (Medallion): uncomment to build staging into a SILVER schema
+      # +schema: silver
+    intermediate:
+      # Intermediate: reusable logic steps, inlined as CTEs downstream
+      +materialized: ephemeral
     marts:
       # Marts: business-ready; tables for query performance
       +materialized: table
+      # Day 5 (Medallion): uncomment to build marts into a GOLD schema
+      # +schema: gold
 
 seeds:
   dbt_training:

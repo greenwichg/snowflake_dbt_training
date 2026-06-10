@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Day 2 / Exercise 3 — Streams & Tasks: a native CDC mini-pipeline
+-- Day 2 / Exercise 9 — Streams & Tasks: a native CDC mini-pipeline
 --
 -- Goal: new rows inserted into RAW.ORDERS automatically flow into a
 -- cleaned ANALYTICS.ORDERS_CLEAN table.

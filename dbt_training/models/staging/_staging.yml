@@ -9,6 +9,12 @@ models:
         tests:
           - unique
           - not_null
+      - name: email
+        description: Lowercased email address.
+        tests:
+          - dbt_expectations.expect_column_values_to_match_regex:
+              arguments:
+                regex: '^[\\w.+-]+@[\\w-]+\\.[\\w.]+$'
       - name: country_code
         description: ISO-3166 alpha-2 country code, uppercased.
 

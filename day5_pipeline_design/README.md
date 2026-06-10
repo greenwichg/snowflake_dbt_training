@@ -1,54 +1,68 @@
-# Day 5 — Pipeline Design + Capstone Kickoff
+# Day 5 — Building the End-to-End Pipeline (Snowflake + DBT Only)
 
 ## Topics Covered
 
-### Layered ELT architecture (medallion-style)
+### Medallion Architecture (Bronze → Silver → Gold)
 
 ```
- Sources          RAW (bronze)          STAGING (silver)        MARTS (gold)
-─────────        ─────────────         ─────────────────       ──────────────
- app DB   ─┐      land data            1:1 with sources,        dim_/fct_ tables,
- SaaS APIs ┼───→  exactly as     ───→  renamed, typed,    ───→  business logic,
- files     ┘      received             cleaned (views)          consumed by BI
-            (COPY INTO / Snowpipe /     (dbt staging)            (dbt marts)
-             Fivetran / Airbyte)
+  Sources           BRONZE                 SILVER                  GOLD
+ ─────────      ──────────────        ─────────────────      ──────────────
+  files,        raw data exactly      cleaned, typed,        business-ready
+  app DBs,  ──→ as received      ──→  deduplicated,     ──→  dims & facts,
+  APIs          (immutable,           conformed              aggregates for
+                replayable)           entities               BI / ML
+                COPY INTO/Snowpipe    dbt staging models     dbt mart models
 ```
 
-Principles:
-- **Raw is immutable** — never transform on the way in; you can always rebuild downstream.
-- **One staging model per source table**, no joins — just rename/cast/clean.
-- **Business logic lives in marts only**, built from `ref()`s, never from raw.
-- **Idempotency** — every layer can be re-run safely (COPY load history, incremental `unique_key`, full-refresh capability).
+### Raw → Staging → Curated layer mapping in Snowflake
 
-### Ingestion options into RAW
+| Medallion | Snowflake schema | dbt layer | Materialization |
+|---|---|---|---|
+| Bronze | `BRONZE` (our Day 1 `RAW`) | sources only — dbt never builds here | loaded tables |
+| Silver | `SILVER` | `models/staging/` (+ ephemeral `intermediate/`) | `view` |
+| Gold | `GOLD` | `models/marts/` | `table` / `incremental` |
 
-| Pattern | Tooling | When |
-|---|---|---|
-| Batch files | `COPY INTO` (Day 1), external stages | Periodic exports, vendor feeds |
-| Continuous files | Snowpipe (auto-ingest from S3 events) | Streaming-ish file drops |
-| CDC inside Snowflake | Streams & Tasks (Day 2) | Derived raw→raw propagation |
-| Managed connectors | Fivetran / Airbyte | SaaS sources (Salesforce, Stripe…) |
+### DBT project best practices & folder conventions
 
-### Orchestration & environments
+- `staging/` is 1:1 with sources, prefix `stg_`, only rename/cast/clean — **no joins, no business logic**
+- `intermediate/` (`int_`) for reusable steps; `marts/` (`dim_`/`fct_`) for consumables
+- One `_sources.yml` per source system; `_<folder>.yml` for model docs/tests
+- Every PK tested `unique` + `not_null`; every model documented
+- Folder-level configs in `dbt_project.yml` (materializations, schemas), model-level overrides only when needed
 
-- Scheduling dbt: dbt Cloud jobs, Airflow (`dbt build` in a DAG task), or Snowflake Tasks calling stored procs.
-- Environments: dev (personal schemas) → CI (ephemeral schema per PR, `dbt build --select state:modified+`) → prod (dedicated role/warehouse/schema).
-- Failure handling: tests gate promotion; alerts on `dbt build` non-zero exit; source freshness checks detect stalled ingestion.
+### Incremental load patterns in DBT
 
-## Hands-On: Design Exercise (morning)
+- **Full load** (`table`): rebuild everything — simplest, correct by construction; fine until build time hurts
+- **Incremental append** (`is_incremental()` + timestamp filter): immutable event data — see `fct_web_events`
+- **Incremental merge** (`unique_key`): mutable rows, late-arriving updates
+- Always design for `--full-refresh` recovery, and know your dedup strategy
 
-In pairs, design on paper a pipeline for this scenario, then present in 10 minutes:
+### Error handling & debugging DBT models
 
-> *An e-commerce company receives: (1) hourly order CSVs from the order system into S3, (2) a clickstream JSON feed, (3) a daily product catalog export. The BI team needs revenue and conversion dashboards refreshed hourly; finance needs month-end-stable numbers.*
+`dbt run` failure workflow: read the error → `dbt compile -s <model>` → run the compiled SQL from `target/compiled/` directly in Snowsight → fix → `dbt build -s <model>+`. Common classes: **bad ref** (typo / model renamed), **schema drift** (source column renamed/dropped — caught early by source `not_null` tests and contracts), **type mismatch** (contract or incremental schema change; see `on_schema_change`).
 
-Your design must specify: stage types & file formats, COPY/Snowpipe choice, schemas & roles, dbt layer structure, materializations per layer, test strategy, schedule, and how month-end stability is achieved (hint: snapshots).
+### Cost monitoring & query optimization for DBT-generated SQL
 
-## Capstone Kickoff (afternoon)
+- Tag dbt's queries: `query_tag: dbt` in `profiles.yml`, then filter `ACCOUNT_USAGE.QUERY_HISTORY` by tag to see exactly what dbt spends
+- Find the slowest models from dbt's own timing output (`dbt run` prints per-model timing; `target/run_results.json` has it machine-readable)
+- Optimize the worst offenders with the Day 2 toolkit: Query Profile → pruning/spilling → right-size the warehouse, prefer incremental over full rebuilds, avoid `select *` in staging of very wide tables
 
-Form teams and start the [Day 6 capstone](../day6_capstone/README.md) — finish scoping and data loading today so Day 6 is for building and presenting.
+## Hands-On Practice
+
+| # | Exercise |
+|---|---|
+| 25 | **Design Bronze / Silver / Gold schemas in Snowflake** — run [`sql/01_medallion_schemas.sql`](sql/01_medallion_schemas.sql) |
+| 26 | **Wire DBT models to each Medallion layer** — uncomment the `+schema: silver` / `+schema: gold` configs in [`dbt_project.yml`](../dbt_training/dbt_project.yml), `dbt run`, and verify staging views land in `..._SILVER` and marts in `..._GOLD` (dbt appends the custom schema to your target schema — read about `generate_schema_name` to control this in prod) |
+| 27 | **Implement full-load and incremental strategies** — compare `dim_customers` (full rebuild) vs `fct_web_events` (incremental append): run each twice and inspect the SQL dbt generated in Query History; then convert `fct_orders` to incremental with `unique_key='order_id'` and test `--full-refresh` |
+| 28 | **Debug a broken model (schema drift, bad ref)** — follow [`exercises/28_debug_broken_model.md`](exercises/28_debug_broken_model.md) |
+| 29 | **Profile queries and reduce warehouse spend** — set `query_tag: dbt` in `profiles.yml`, `dbt run`, then use the queries in the exercise file + Day 2's cost queries to find dbt's most expensive model; check its Query Profile |
+| 30 | **Run dbt build end-to-end and verify results** — from a clean schema: `dbt build` (seed → snapshot → models → tests in DAG order, fail-fast); verify in Snowsight that every layer exists and `dbt build` exits green |
 
 ## Learning Outcomes
 
-- Design an end-to-end layered ELT pipeline on Snowflake + dbt
-- Choose appropriate ingestion, materialization, and orchestration per workload
-- Plan environments, testing, and failure handling like a production team
+- ✅ Design a clean Medallion pipeline in Snowflake + DBT
+- ✅ Choose the right materialization per layer
+- ✅ Identify and fix common DBT + Snowflake issues
+- ✅ Monitor costs and optimize query performance
+
+➡️ Wrap up the day by kicking off the [capstone project](../day6_capstone/README.md) — finish scoping and data loading today so Day 6 is for building and presenting.

@@ -1,4 +1,6 @@
 -- Mart: customer dimension enriched with lifetime order metrics.
+-- Pattern: staging → intermediate → mart. int_customer_orders is ephemeral,
+-- so it compiles into a CTE here rather than existing in Snowflake.
 
 with customers as (
 
@@ -6,24 +8,9 @@ with customers as (
 
 ),
 
-orders as (
-
-    select * from {{ ref('stg_orders') }}
-    where status = 'completed'
-
-),
-
 customer_orders as (
 
-    select
-        customer_id,
-        count(*)            as lifetime_orders,
-        sum(amount_usd)     as lifetime_value_usd,
-        min(order_date)     as first_order_date,
-        max(order_date)     as most_recent_order_date
-
-    from orders
-    group by customer_id
+    select * from {{ ref('int_customer_orders') }}
 
 )
 

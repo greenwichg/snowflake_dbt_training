@@ -1,29 +1,38 @@
-# Day 3 — dbt Fundamentals
+# Day 3 — Introduction to DBT: Models, Project Structure & Materializations
 
 > From here on we work inside the [`dbt_training/`](../dbt_training/) project at the repo root.
 
 ## Topics Covered
 
-- What dbt is and where it sits in ELT (the **T**, running inside Snowflake)
-- dbt project anatomy: `dbt_project.yml`, models, `profiles.yml`
-- **Sources** (`source()`): declaring raw tables dbt reads but doesn't build
-- **Models** & **`ref()`**: SQL `SELECT`s that dbt materializes, with automatic dependency ordering (the DAG)
-- **Materializations**: `view`, `table` (`incremental` and snapshots come on Day 4)
-- Staging vs marts layering convention
-- Jinja basics: `{{ }}`, `{% %}`, simple loops
-- `dbt run`, `dbt compile`, `dbt run -s <model>`, the `target/` folder
+- **What is DBT? — Analytics Engineering Philosophy**: transformations as version-controlled, tested, documented SQL `SELECT`s; dbt is the **T** in ELT, compiling Jinja+SQL and running it inside Snowflake
+- **DBT Core vs DBT Cloud**: Core = open-source CLI (what we use, free, runs anywhere); Cloud = managed SaaS adding an IDE, job scheduler, CI hooks, and hosted docs
+- **DBT Architecture & Project Structure**: `dbt_project.yml`, `models/`, `seeds/`, `snapshots/`, `macros/`, `tests/`, `target/` (compiled artifacts), `profiles.yml` (connections, lives outside the repo)
+- **Connecting DBT with Snowflake**: account/role/warehouse/database/schema, `dbt debug`
+- **Models & Materializations**:
+  | Materialization | Builds | Use for |
+  |---|---|---|
+  | `view` (default) | `CREATE VIEW` | staging; cheap, always fresh |
+  | `table` | `CREATE TABLE AS` | marts; fast to query |
+  | `incremental` | insert/merge only new rows | big fact tables |
+  | `ephemeral` | nothing — inlined as a CTE into downstream models | small reusable logic steps |
+- **Sources and refs**: `source()` declares raw inputs; `ref()` wires model-to-model dependencies and builds the DAG
+- **Jinja Templating**: `{{ }}` expressions, `{% %}` control flow, what compilation produces in `target/compiled/`
+- **Seeds & Snapshots**: version-controlled lookup CSVs (`dbt seed`); SCD Type 2 history capture (`dbt snapshot`)
 
 ## Hands-On Practice
 
-1. **Install & connect** — follow [`01_setup_dbt_snowflake.md`](01_setup_dbt_snowflake.md): install `dbt-snowflake`, configure `profiles.yml` from [`../dbt_training/profiles.yml.example`](../dbt_training/profiles.yml.example), then `dbt debug`.
-2. **Declare sources** — read [`models/staging/_sources.yml`](../dbt_training/models/staging/_sources.yml); run `dbt source freshness`.
-3. **Run the staging models** — `dbt run -s staging`. Inspect compiled SQL in `target/compiled/`. Find the views in Snowsight (`<your_dev_schema>` in `TRAINING_DB`).
-4. **Run the marts** — `dbt run -s marts`. Look at `fct_orders` and `dim_customers`; trace the DAG with `dbt ls -s +fct_orders`.
-5. **Build your own model** — create `models/marts/fct_monthly_revenue.sql` that aggregates `ref('fct_orders')` by month (you wrote this SQL on Day 1, Exercise 6!). Run just it: `dbt run -s fct_monthly_revenue`.
+| # | Exercise |
+|---|---|
+| 13 | **Install DBT Core locally and configure `profiles.yml`** — follow [`01_setup_dbt_snowflake.md`](01_setup_dbt_snowflake.md) |
+| 14 | **Connect DBT project to Snowflake** — `dbt debug` until all green, then `dbt deps` |
+| 15 | **Create first staging model and run dbt run** — study [`stg_customers.sql`](../dbt_training/models/staging/stg_customers.sql) + [`_sources.yml`](../dbt_training/models/staging/_sources.yml); `dbt run -s stg_customers`; find the view in Snowsight and the compiled SQL in `target/compiled/` |
+| 16 | **Build table, view, and incremental models** — `dbt run`; compare materializations: `stg_*` (views), `dim_customers`/`fct_orders` (tables), `fct_web_events` (incremental — run twice, compare Query History), `int_customer_orders` (ephemeral — find it inlined as a CTE in `dim_customers`' compiled SQL, and note no object exists in Snowflake) |
+| 17 | **Use source() and ref() functions** — `dbt ls -s +dim_customers` to walk the DAG; build your own `fct_monthly_revenue` model that `ref()`s `fct_orders` |
+| 18 | **Load seed data; create a snapshot** — `dbt seed` (loads [`fx_rates.csv`](../dbt_training/seeds/fx_rates.csv)); `dbt snapshot` (runs [`customers_snapshot.sql`](../dbt_training/snapshots/customers_snapshot.sql)); change a customer's country in `RAW.CUSTOMERS` and snapshot again to see SCD2 rows |
 
 ## Learning Outcomes
 
-- Set up dbt against Snowflake and explain the project structure
-- Write models that build on sources and other models via `ref()` / `source()`
-- Choose between view and table materializations
-- Read compiled SQL and the dbt DAG
+- ✅ Explain DBT's role in the ELT pipeline
+- ✅ Build and execute DBT models of all materialization types
+- ✅ Understand DBT project folder structure
+- ✅ Use sources, refs, seeds, and snapshots effectively

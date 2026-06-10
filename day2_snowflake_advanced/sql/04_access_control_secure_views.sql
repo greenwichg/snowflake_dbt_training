@@ -1,8 +1,9 @@
 --------------------------------------------------------------------------------
--- Day 2 / Exercise 4 — Role-based access control (RBAC)
+-- Day 2 / Exercise 7 — Secure views & RBAC (roles, grants, users)
 --
 -- Goal: an ANALYST role that can read ANALYTICS but cannot touch RAW,
--- and a TRANSFORMER role (used by dbt from Day 3) that builds ANALYTICS.
+-- a TRANSFORMER role (used by dbt from Day 3) that builds ANALYTICS,
+-- and a SECURE VIEW that safely exposes only masked customer data.
 --------------------------------------------------------------------------------
 USE ROLE SECURITYADMIN;   -- role & grant management
 
@@ -56,7 +57,56 @@ USE ROLE SYSADMIN;
 SHOW GRANTS TO ROLE ANALYST;
 SHOW GRANTS ON SCHEMA TRAINING_DB.ANALYTICS;
 
+--------------------------------------------------------------------------------
+-- 5. SECURE VIEWS — expose data without leaking what's underneath
+--------------------------------------------------------------------------------
+-- A regular view's definition is visible to anyone who can use it, and the
+-- optimizer may push user predicates INTO the view (which can leak rows via
+-- clever filters/UDFs). A SECURE view:
+--   * hides its definition from non-owners
+--   * disables optimizations that could bypass its filters
+--   * is REQUIRED for views used in data shares
+USE ROLE SYSADMIN;
+
+CREATE OR REPLACE SECURE VIEW TRAINING_DB.ANALYTICS.CUSTOMERS_MASKED AS
+SELECT
+    CUSTOMER_ID,
+    FIRST_NAME,
+    LEFT(LAST_NAME, 1) || '***'                          AS LAST_NAME_MASKED,
+    REGEXP_REPLACE(EMAIL, '^[^@]+', '*****')             AS EMAIL_MASKED,
+    COUNTRY,
+    SIGNUP_DATE
+FROM TRAINING_DB.RAW.CUSTOMERS
+WHERE IS_ACTIVE = TRUE;            -- inactive customers are not exposed at all
+
+GRANT SELECT ON VIEW TRAINING_DB.ANALYTICS.CUSTOMERS_MASKED TO ROLE ANALYST;
+
+-- Test as ANALYST: masked data visible, definition hidden
+USE ROLE ANALYST;
+SELECT * FROM TRAINING_DB.ANALYTICS.CUSTOMERS_MASKED LIMIT 5;     -- works, masked
+SELECT GET_DDL('VIEW', 'TRAINING_DB.ANALYTICS.CUSTOMERS_MASKED'); -- fails: not owner
+
+USE ROLE SYSADMIN;
+SHOW VIEWS LIKE 'CUSTOMERS_MASKED' IN SCHEMA TRAINING_DB.ANALYTICS;  -- is_secure = true
+
+--------------------------------------------------------------------------------
+-- 6. Data sharing (concept + template)
+--------------------------------------------------------------------------------
+-- Secure Data Sharing exposes live, read-only data to ANOTHER Snowflake
+-- account with no copying — consumers query your storage with their compute.
+-- (Needs a second account to fully demo; template:)
+--
+-- USE ROLE ACCOUNTADMIN;
+-- CREATE SHARE TRAINING_SHARE;
+-- GRANT USAGE ON DATABASE TRAINING_DB                         TO SHARE TRAINING_SHARE;
+-- GRANT USAGE ON SCHEMA TRAINING_DB.ANALYTICS                 TO SHARE TRAINING_SHARE;
+-- GRANT SELECT ON VIEW TRAINING_DB.ANALYTICS.CUSTOMERS_MASKED TO SHARE TRAINING_SHARE;
+-- ALTER SHARE TRAINING_SHARE ADD ACCOUNTS = ('<consumer_account>');
+--
+-- Only SECURE views/UDFs can be shared — exactly why we built one above.
+
 -- Checkpoint:
 --  * Why grant FUTURE privileges, not just ALL?
 --  * Why do roles roll up to SYSADMIN instead of granting objects to users directly?
 --  * Which role will dbt use on Day 3, and why not ACCOUNTADMIN?
+--  * Why must shared views be SECURE views?

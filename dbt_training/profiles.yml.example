@@ -14,3 +14,4 @@ dbt_training:
       database: TRAINING_DB
       schema: DBT_<YOURNAME>              # your personal dev schema
       threads: 4
+      query_tag: dbt                      # Day 5: find dbt's spend in QUERY_HISTORY

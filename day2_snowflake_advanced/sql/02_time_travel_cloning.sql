@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Day 2 / Exercise 2 — Time Travel & zero-copy cloning
+-- Day 2 / Exercises 8 & 12 — Time Travel & zero-copy cloning
 --------------------------------------------------------------------------------
 USE ROLE SYSADMIN;
 USE WAREHOUSE TRAINING_WH;

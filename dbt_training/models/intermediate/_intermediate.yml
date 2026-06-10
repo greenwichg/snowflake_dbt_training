@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: int_customer_orders
+    description: >
+      Per-customer lifetime metrics over completed orders. Ephemeral —
+      inlined as a CTE wherever it is ref()'d, never built in the database.
+    columns:
+      - name: customer_id
+        description: One row per customer with at least one completed order.

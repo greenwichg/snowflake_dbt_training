@@ -9,11 +9,13 @@ This repository contains all materials — guides, SQL scripts, sample data, and
 | Day | Theme | Focus |
 |-----|-------|-------|
 | [Day 1](day1_snowflake_fundamentals/) | Modern Data Warehousing + Snowflake Fundamentals | Snowflake architecture, databases/schemas/tables, stages, COPY INTO, semi-structured data |
-| [Day 2](day2_snowflake_advanced/) | Snowflake Advanced Features | Warehouses & scaling, Time Travel, zero-copy cloning, Streams & Tasks, access control |
-| [Day 3](day3_dbt_fundamentals/) | dbt Fundamentals | dbt project setup, models, sources, `ref()`, materializations, Jinja basics |
-| [Day 4](day4_dbt_advanced/) | dbt Advanced | Tests, documentation, snapshots, incremental models, macros, packages |
-| [Day 5](day5_pipeline_design/) | Pipeline Design + Capstone Kickoff | End-to-end ELT pipeline design, layered architecture, orchestration, capstone start |
+| [Day 2](day2_snowflake_advanced/) | Snowflake Performance, Security & Advanced Features | Caching & clustering, query profiling & cost, secure views & RBAC, Time Travel, Streams & Tasks, Snowpipe, Dynamic Tables, cloning & sharing, Iceberg overview |
+| [Day 3](day3_dbt_fundamentals/) | Introduction to DBT — Models, Project Structure & Materializations | Core vs Cloud, project structure, all materializations, sources & refs, Jinja, seeds & snapshots |
+| [Day 4](day4_dbt_advanced/) | DBT Transformations, Testing & Documentation | Macros, staging→intermediate→marts design, generic/singular/custom tests, dbt-expectations, docs & lineage, data contracts |
+| [Day 5](day5_pipeline_design/) | Building the End-to-End Pipeline (Snowflake + DBT Only) | Medallion architecture (Bronze→Silver→Gold), incremental patterns, debugging, cost monitoring & query optimization |
 | [Day 6](day6_capstone/) | Capstone Project | Build and present a complete Snowflake + dbt pipeline |
+
+The hands-on exercises are numbered 1–30 across Days 1–5, matching the training plan document.
 
 ## Day 1 — Modern Data Warehousing + Snowflake Fundamentals
 
