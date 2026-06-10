@@ -22,8 +22,8 @@ select
     customers.country_code,
     customers.signup_date,
     customers.is_active,
-    coalesce(customer_orders.lifetime_orders, 0)    as lifetime_orders,
-    coalesce(customer_orders.lifetime_value_usd, 0) as lifetime_value_usd,
+    coalesce(customer_orders.lifetime_orders, 0)::integer           as lifetime_orders,
+    coalesce(customer_orders.lifetime_value_usd, 0)::number(12, 2)  as lifetime_value_usd,
     customer_orders.first_order_date,
     customer_orders.most_recent_order_date
 

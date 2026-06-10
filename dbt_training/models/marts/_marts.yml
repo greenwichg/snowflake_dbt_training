@@ -34,7 +34,8 @@ models:
         data_type: number
       - name: lifetime_value_usd
         description: Sum of completed order amounts in USD.
-        data_type: number
+        # NUMBER with no scale means NUMBER(38,0) - it would silently round!
+        data_type: number(12,2)
       - name: first_order_date
         data_type: date
       - name: most_recent_order_date
