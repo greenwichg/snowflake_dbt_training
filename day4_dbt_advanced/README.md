@@ -25,6 +25,8 @@
 | 23 | **Run dbt test and interpret failures** — `dbt test`; then break one on purpose: insert a duplicate `ORDER_ID` into `RAW.ORDERS`, run `dbt test -s stg_orders`, open the compiled test SQL from `target/` to find the offending rows, fix, re-run. Try `dbt build` to see tests gate downstream models |
 | 24 | **Generate and serve dbt docs site** — `dbt docs generate && dbt docs serve`; explore model pages, column descriptions, and the lineage graph from `raw` sources to marts; click through `dim_customers`' enforced contract |
 
+> ✅ **Stuck or done?** Reference answers for the write-it-yourself tasks are in [solutions/](solutions/).
+
 ## Learning Outcomes
 
 - ✅ Build layered transformations (staging → marts)

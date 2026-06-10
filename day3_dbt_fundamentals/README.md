@@ -32,6 +32,8 @@
 | 17 | **Use source() and ref() functions** — `dbt ls -s +dim_customers` to walk the DAG; build your own `fct_monthly_revenue` model that `ref()`s `fct_orders` |
 | 18 | **Load seed data; create a snapshot** — `dbt seed` (loads [`fx_rates.csv`](../dbt_training/seeds/fx_rates.csv)); `dbt snapshot` (runs [`customers_snapshot.sql`](../dbt_training/snapshots/customers_snapshot.sql)); change a customer's country in `RAW.CUSTOMERS` and snapshot again to see SCD2 rows |
 
+> ✅ **Stuck or done?** Reference answers for the write-it-yourself tasks are in [solutions/](solutions/).
+
 ## Learning Outcomes
 
 - ✅ Explain DBT's role in the ELT pipeline

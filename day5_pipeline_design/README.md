@@ -60,6 +60,8 @@
 | 29 | **Profile queries and reduce warehouse spend** — set `query_tag: dbt` in `profiles.yml`, `dbt run`, then use the queries in the exercise file + Day 2's cost queries to find dbt's most expensive model; check its Query Profile |
 | 30 | **Run dbt build end-to-end and verify results** — from a clean schema: `dbt build` (seed → snapshot → models → tests in DAG order, fail-fast); verify in Snowsight that every layer exists and `dbt build` exits green |
 
+> ✅ **Stuck or done?** Reference answers for the write-it-yourself tasks are in [solutions/](solutions/).
+
 ## Learning Outcomes
 
 - ✅ Design a clean Medallion pipeline in Snowflake + DBT
