@@ -1,0 +1,32 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw data loaded during the Day 1 Snowflake labs.
+    database: TRAINING_DB
+    schema: RAW
+    tables:
+      - name: customers
+        description: One row per registered customer (loaded from customers.csv).
+        columns:
+          - name: customer_id
+            description: Primary key.
+            tests:
+              - unique
+              - not_null
+
+      - name: orders
+        description: One row per order (loaded from orders.csv).
+        config:
+          loaded_at_field: TO_TIMESTAMP_NTZ(order_date)
+          freshness:
+            warn_after: {count: 9999, period: day}  # relaxed: static training data
+        columns:
+          - name: order_id
+            tests:
+              - unique
+              - not_null
+
+      - name: web_events_raw
+        description: Raw JSON web events in a single VARIANT column.
+        identifier: WEB_EVENTS_RAW

@@ -1,0 +1,16 @@
+# Copy to ~/.dbt/profiles.yml and fill in your details.
+# NEVER commit real credentials to the repo.
+
+dbt_training:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: <orgname-accountname>      # Snowsight → your name → Account
+      user: <your_username>
+      password: <your_password>           # or use authenticator/key-pair auth
+      role: TRANSFORMER                   # from Day 2 RBAC lab (or SYSADMIN)
+      warehouse: TRAINING_WH
+      database: TRAINING_DB
+      schema: DBT_<YOURNAME>              # your personal dev schema
+      threads: 4

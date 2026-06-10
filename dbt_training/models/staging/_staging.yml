@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Cleaned customers, one row per customer.
+    columns:
+      - name: customer_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: country_code
+        description: ISO-3166 alpha-2 country code, uppercased.
+
+  - name: stg_orders
+    description: Typed orders with amounts normalized to USD.
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: FK to stg_customers.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['completed', 'cancelled', 'refunded']
+
+  - name: stg_web_events
+    description: Flattened, typed web events from raw JSON.
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null

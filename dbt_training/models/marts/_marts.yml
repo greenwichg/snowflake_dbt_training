@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: >
+      Customer dimension: one row per customer with lifetime order metrics.
+      Lifetime values count completed orders only, in USD.
+    columns:
+      - name: customer_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: lifetime_value_usd
+        description: Sum of completed order amounts in USD.
+
+  - name: fct_orders
+    description: One row per order with customer attributes and order sequencing.
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+      - name: amount_usd
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+  - name: fct_web_events
+    description: Incremental fact of flattened web events, one row per event.
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null

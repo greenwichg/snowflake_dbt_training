@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+
+# dbt
+dbt_training/target/
+dbt_training/dbt_packages/
+dbt_training/logs/
+logs/
+
+# Credentials — never commit
+profiles.yml
+!*.yml.example
+
+# OS
+.DS_Store
