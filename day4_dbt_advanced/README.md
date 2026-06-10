@@ -1,5 +1,7 @@
 # Day 4 — DBT Transformations, Testing & Documentation
 
+> 🧠 **New to these topics?** Read [CONCEPTS.md](CONCEPTS.md) first — every concept below explained from zero, with analogies.
+
 > All exercises happen in [`dbt_training/`](../dbt_training/); each feature below is already wired into the project so you can study a working example, then extend it.
 
 ## Topics Covered

@@ -1,5 +1,7 @@
 # Day 2 — Snowflake Performance, Security & Advanced Features
 
+> 🧠 **New to these topics?** Read [CONCEPTS.md](CONCEPTS.md) first — every concept below explained from zero, with analogies.
+
 > Builds on the `TRAINING_DB` objects created on Day 1.
 
 ## Topics Covered

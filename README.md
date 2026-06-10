@@ -19,6 +19,8 @@ This repository contains all materials — guides, SQL scripts, sample data, and
 
 The hands-on exercises are numbered 1–30 across Days 1–5, matching the training plan document.
 
+**Completely new to Snowflake and dbt?** Each day folder contains a `CONCEPTS.md` that explains every topic from zero — plain language, analogies, and a mini-glossary. Read it before that day's lab: [Day 1](day1_snowflake_fundamentals/CONCEPTS.md) · [Day 2](day2_snowflake_advanced/CONCEPTS.md) · [Day 3](day3_dbt_fundamentals/CONCEPTS.md) · [Day 4](day4_dbt_advanced/CONCEPTS.md) · [Day 5](day5_pipeline_design/CONCEPTS.md)
+
 ## Day 1 — Modern Data Warehousing + Snowflake Fundamentals
 
 **Topics Covered**

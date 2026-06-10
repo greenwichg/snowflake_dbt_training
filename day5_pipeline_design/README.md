@@ -1,5 +1,7 @@
 # Day 5 — Building the End-to-End Pipeline (Snowflake + DBT Only)
 
+> 🧠 **New to these topics?** Read [CONCEPTS.md](CONCEPTS.md) first — every concept below explained from zero, with analogies.
+
 ## Topics Covered
 
 ### Medallion Architecture (Bronze → Silver → Gold)

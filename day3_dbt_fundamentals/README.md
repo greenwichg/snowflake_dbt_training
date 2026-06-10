@@ -1,5 +1,7 @@
 # Day 3 — Introduction to DBT: Models, Project Structure & Materializations
 
+> 🧠 **New to these topics?** Read [CONCEPTS.md](CONCEPTS.md) first — every concept below explained from zero, with analogies.
+
 > From here on we work inside the [`dbt_training/`](../dbt_training/) project at the repo root.
 
 ## Topics Covered

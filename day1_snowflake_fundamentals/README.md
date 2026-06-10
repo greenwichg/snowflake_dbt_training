@@ -1,5 +1,7 @@
 # Day 1 — Modern Data Warehousing + Snowflake Fundamentals
 
+> 🧠 **New to these topics?** Read [CONCEPTS.md](CONCEPTS.md) first — every concept below explained from zero, with analogies.
+
 ## Topics Covered
 
 ### 1. Traditional DW vs Cloud DW
