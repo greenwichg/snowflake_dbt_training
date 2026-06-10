@@ -17,35 +17,9 @@ This repository contains all materials — guides, SQL scripts, sample data, and
 | [Day 7](capstone/) | Capstone Day 2 of 2 — Gold Layer, Documentation & Presentation | Three Gold marts, surrogate key macro, relationship tests, dbt docs & lineage |
 | [Day 8](capstone/README.md#day-8--demo-to-stakeholders-and-team) | Demo to Stakeholders and Team | Architecture walkthrough, business insights, Q&A |
 
-The hands-on exercises are numbered 1–30 across Days 1–5, matching the training plan document.
+The hands-on exercises are numbered 1–30 across Days 1–5, matching the training plan document. Each day's folder README has the full breakdown — **Topics Covered**, **Hands-On Practice** (with runnable scripts), and **Learning Outcomes** — for that day.
 
 **Completely new to Snowflake and dbt?** Each day folder contains a `CONCEPTS.md` that explains every topic from zero — plain language, analogies, and a mini-glossary. Read it before that day's lab: [Day 1](day1_snowflake_fundamentals/CONCEPTS.md) · [Day 2](day2_snowflake_advanced/CONCEPTS.md) · [Day 3](day3_dbt_fundamentals/CONCEPTS.md) · [Day 4](day4_dbt_advanced/CONCEPTS.md) · [Day 5](day5_pipeline_design/CONCEPTS.md)
-
-## Day 1 — Modern Data Warehousing + Snowflake Fundamentals
-
-**Topics Covered**
-- Traditional DW vs Cloud DW
-- OLTP vs OLAP
-- ETL vs ELT
-- Snowflake Architecture (Storage, Compute, Cloud Services)
-- Databases, Schemas, Tables, Stages
-- Snowflake SQL Refresher
-- COPY INTO & File Formats
-- Internal vs External Stages
-- Semi-structured Data (JSON/VARIANT)
-
-**Hands-On Practice**
-1. Create Snowflake trial account & explore Snowsight UI
-2. Create database / schema / tables
-3. Load CSV manually and via COPY INTO
-4. Query JSON / VARIANT data
-5. Create stages and file formats
-
-**Learning Outcomes**
-- Explain Snowflake architecture and ELT approach
-- Understand compute–storage separation
-- Load and query structured & semi-structured data
-- Write complex analytical SQL queries
 
 ## Prerequisites
 
