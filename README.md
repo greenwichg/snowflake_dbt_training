@@ -1,6 +1,6 @@
 # Snowflake + DBT Training Plan
 
-**6-Day Intensive Program** | Days 1–4: Core Skills | Day 5: Pipeline Design | Days 5–6: Capstone Project
+**Intensive Program** | Days 1–4: Core Skills | Day 5: Pipeline Design | Days 6–7: 2-Day Capstone | Day 8: Demo
 
 This repository contains all materials — guides, SQL scripts, sample data, and a working dbt project — for a hands-on Snowflake + dbt training program.
 
@@ -13,7 +13,9 @@ This repository contains all materials — guides, SQL scripts, sample data, and
 | [Day 3](day3_dbt_fundamentals/) | Introduction to DBT — Models, Project Structure & Materializations | Core vs Cloud, project structure, all materializations, sources & refs, Jinja, seeds & snapshots |
 | [Day 4](day4_dbt_advanced/) | DBT Transformations, Testing & Documentation | Macros, staging→intermediate→marts design, generic/singular/custom tests, dbt-expectations, docs & lineage, data contracts |
 | [Day 5](day5_pipeline_design/) | Building the End-to-End Pipeline (Snowflake + DBT Only) | Medallion architecture (Bronze→Silver→Gold), incremental patterns, debugging, cost monitoring & query optimization |
-| [Day 6](day6_capstone/) | Capstone Project | Build and present a complete Snowflake + dbt pipeline |
+| [Day 6](capstone/) | Capstone Day 1 of 2 — Data Ingestion + Bronze & Silver Layers | Retail Sales Analytics Platform: COPY INTO loads, sources, staging models, tests, incremental orders |
+| [Day 7](capstone/) | Capstone Day 2 of 2 — Gold Layer, Documentation & Presentation | Three Gold marts, surrogate key macro, relationship tests, dbt docs & lineage |
+| [Day 8](capstone/README.md#day-8--demo-to-stakeholders-and-team) | Demo to Stakeholders and Team | Architecture walkthrough, business insights, Q&A |
 
 The hands-on exercises are numbered 1–30 across Days 1–5, matching the training plan document.
 
@@ -57,6 +59,6 @@ day2_snowflake_advanced/       Advanced Snowflake feature labs
 day3_dbt_fundamentals/         dbt setup guide + first models
 day4_dbt_advanced/             Tests, snapshots, incremental labs
 day5_pipeline_design/          Pipeline architecture + design exercise
-day6_capstone/                 Capstone project specification
+capstone/                      Days 6-8: Retail Sales Analytics Platform capstone (+ datasets)
 dbt_training/                  Working dbt project used in Days 3–6
 ```

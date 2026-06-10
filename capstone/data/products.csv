@@ -1,0 +1,11 @@
+product_id,name,category,cost_price,supplier_id
+101,Trail Running Shoes,Footwear,45.00,S-01
+102,Waterproof Hiking Boots,Footwear,62.50,S-01
+103,Merino Wool Socks,Footwear,4.20,S-02
+104,Insulated Jacket,Apparel,58.00,S-03
+105,Quick-Dry T-Shirt,Apparel,6.50,S-03
+106,Convertible Hiking Pants,Apparel,18.75,S-03
+107,55L Trekking Backpack,Gear,72.00,S-04
+108,2-Person Tent,Gear,95.00,S-04
+109,Titanium Water Bottle,Accessories,11.00,
+110,LED Headlamp,Accessories,8.40,S-05

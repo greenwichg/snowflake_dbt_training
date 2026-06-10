@@ -1,0 +1,16 @@
+customer_id,name,city,country,signup_date,segment
+1,Amelia Stone,Austin,US,2023-11-04,consumer
+2,Rohan Patel,Mumbai,IN,2023-12-12,consumer
+3,Lucia Garcia,,ES,2024-01-08,consumer
+4,Tomasz Kowalski,Warsaw,PL,2024-01-19,corporate
+5,Mei Chen,Singapore,SG,2024-02-02,consumer
+6,Noah Williams,Denver,US,2024-02-14,wholesale
+7,Fatima Khan,Dubai,AE,2024-03-01,corporate
+8,Oliver Smith,Leeds,GB,2024-03-09,consumer
+9,Sofia Rossi,Milan,IT,2024-03-22,consumer
+10,Lars Nielsen,Copenhagen,DK,2024-04-05,corporate
+11,Aisha Mohammed,Lagos,NG,2024-04-18,consumer
+12,Hugo Martin,Lyon,FR,2024-05-02,
+13,Yuki Tanaka,Osaka,JP,2024-05-16,consumer
+14,Emma Brown,Sydney,AU,2024-06-01,wholesale
+15,Sai Yerram,Hyderabad,IN,2024-06-10,consumer

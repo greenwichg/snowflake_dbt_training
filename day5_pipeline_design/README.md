@@ -65,4 +65,4 @@
 - ✅ Identify and fix common DBT + Snowflake issues
 - ✅ Monitor costs and optimize query performance
 
-➡️ Wrap up the day by kicking off the [capstone project](../day6_capstone/README.md) — finish scoping and data loading today so Day 6 is for building and presenting.
+➡️ Next: the [2-day capstone project](../capstone/README.md) — a Retail Sales Analytics Platform built end-to-end on Days 6–7, demoed on Day 8.
