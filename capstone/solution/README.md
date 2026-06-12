@@ -4,7 +4,9 @@
 
 A complete implementation of tasks 31–44: Snowflake setup + a standalone dbt project (`dbt_capstone/`), separate from the training project.
 
-> 🧠 **New to Snowflake/dbt?** Read [WALKTHROUGH.md](WALKTHROUGH.md) alongside running this — it narrates the full execution flow start-to-end: what each command actually does behind the scenes, what exists in Snowflake after every phase, and the exact numbers to expect at each checkpoint.
+> 🧠 **New to Snowflake/dbt?** Two companion docs:
+> - [WALKTHROUGH.md](WALKTHROUGH.md) — the execution narrated *over time*: what each command does behind the scenes, what exists in Snowflake after every phase, and the numbers to expect at each checkpoint.
+> - [dbt_capstone/PROJECT_GUIDE.md](dbt_capstone/PROJECT_GUIDE.md) — the project explained *file by file*: the purpose of every file, how dbt derives the execution order (there is no "main file"!), dependencies between files, and the data lineage from raw to marts.
 
 ## How to run it
 

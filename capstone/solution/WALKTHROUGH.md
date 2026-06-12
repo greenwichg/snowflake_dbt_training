@@ -2,6 +2,8 @@
 
 A beginner-friendly narrative of **what actually happens** when you run the solution: every command, what it does behind the scenes, what exists in Snowflake afterwards, and the numbers that prove each step worked. Read it side-by-side with running the steps.
 
+> **Companion doc:** this narrates the pipeline *over time*; [dbt_capstone/PROJECT_GUIDE.md](dbt_capstone/PROJECT_GUIDE.md) explains it *file by file* — every file's purpose, dependencies, and lineage.
+
 > **Before you start:** this assumes the basic vocabulary from the training days — warehouse, stage, view vs table, model, test. If words like "stage" or "materialization" are fuzzy, skim [Day 1 concepts](../../day1_snowflake_fundamentals/CONCEPTS.md) and [Day 3 concepts](../../day3_dbt_fundamentals/CONCEPTS.md) first (15 minutes); this document will read twice as fast.
 
 **The journey in one picture (10-second version):**
