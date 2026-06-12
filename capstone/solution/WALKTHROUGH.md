@@ -2,6 +2,8 @@
 
 A beginner-friendly narrative of **what actually happens** when you run the solution: every command, what it does behind the scenes, what exists in Snowflake afterwards, and the numbers that prove each step worked. Read it side-by-side with running the steps.
 
+> **Before you start:** this assumes the basic vocabulary from the training days — warehouse, stage, view vs table, model, test. If words like "stage" or "materialization" are fuzzy, skim [Day 1 concepts](../../day1_snowflake_fundamentals/CONCEPTS.md) and [Day 3 concepts](../../day3_dbt_fundamentals/CONCEPTS.md) first (15 minutes); this document will read twice as fast.
+
 **The journey in one picture (10-second version):**
 
 ```
@@ -41,7 +43,7 @@ A beginner-friendly narrative of **what actually happens** when you run the solu
  PHASE 3 ── terminal: dbt build   (parse refs → DAG → run in dependency order)
  ────────────────────────────────────────────────────────────────────────────
         │
-        │  🚧 GATE 1: source tests — unique + not_null on the 3 raw PKs
+        │  🚧 GATE 1: source tests — unique + not_null on the 3 raw primary keys
         │             (bad input stops here, before anything is built)
         ▼
  ┌─ CAPSTONE_DB.ANALYTICS = Silver (cleaned & typed — dbt staging) ─────────┐
@@ -52,16 +54,16 @@ A beginner-friendly narrative of **what actually happens** when you run the solu
  │                 rows where order_date > max already loaded  (task 36)    │
  └───────────────────────────────────────────────────────────────────────────┘
         │
-        │  🚧 GATE 2: 13 staging tests — PKs + accepted_values on status &
+        │  🚧 GATE 2: 13 staging tests — keys + accepted_values on status &
         │             segment. ANY failure ⇒ marts are SKIPPED (fail-fast)
         ▼
  ┌─ CAPSTONE_DB.ANALYTICS = Gold (business-ready TABLEs — dbt marts) ───────┐
- │  mart_daily_sales          60   revenue / orders / AOV per day           │
- │  mart_customer_summary     15   LTV per customer; zero-order customers   │
- │                                 kept by LEFT JOIN (total LTV ≈ 8,708.92) │
+ │  mart_daily_sales          60   revenue / orders / avg order value/day   │
+ │  mart_customer_summary     15   lifetime value (LTV) per customer;       │
+ │                                 zero-order kept (total LTV ≈ 8,708.92)   │
  │  mart_product_performance  10   revenue / margin / below-cost units      │
- │  every PK built by the surrogate_key() macro → expands to md5(...) at    │
- │  compile time (see target/compiled/)                                     │
+ │  every primary key is built by the surrogate_key() macro → expands to    │
+ │  md5(...) at compile time (see target/compiled/)                         │
  └───────────────────────────────────────────────────────────────────────────┘
         │
         │  🚧 GATE 3: mart tests — unique keys + relationships back to staging
@@ -86,7 +88,7 @@ A beginner-friendly narrative of **what actually happens** when you run the solu
 
 1. `CREATE WAREHOUSE CAPSTONE_WH … AUTO_SUSPEND = 60` — creates a *compute engine* (remember: in Snowflake a "warehouse" runs queries, it doesn't store anything). It starts suspended and switches itself off 60s after you stop querying, so it can't quietly burn credits.
 2. `CREATE DATABASE CAPSTONE_DB` + `SCHEMA RAW` — empty containers. `RAW` is our Bronze layer: data lands here exactly as received and is never edited afterwards.
-3. Three `CREATE TABLE` statements — empty tables whose columns mirror the CSV headers. Note `STATUS VARCHAR(30)` is deliberately loose: the messy values (`COMPLETED`, `Completed`…) are loaded *as-is*; cleaning is dbt's job, not the loader's. That separation is the whole ELT idea.
+3. Three `CREATE TABLE` statements — empty tables whose columns mirror the CSV headers. Note `STATUS VARCHAR(30)` is deliberately loose: the messy values (`COMPLETED`, `Completed`…) are loaded *as-is*; cleaning is dbt's job, not the loader's. That separation is the whole ELT idea (Day 1, concept 3).
 4. `CREATE FILE FORMAT FF_CSV` — saved parsing instructions: comma-separated, skip the header row, `''` becomes NULL (this is how the blank `city`/`segment`/`supplier_id` cells in the CSVs turn into proper NULLs).
 5. `CREATE STAGE CSV_STAGE` — the "file in-box". Your upload puts the 3 files *into Snowflake* but **not yet into any table**. `LIST @RAW.CSV_STAGE` should show 3 files.
 6. Three `COPY INTO … PATTERN = '…'` — the actual bulk load: Snowflake reads each staged file, parses it per the file format, and appends the rows to the matching table. Each COPY reports `LOADED` per file. Run a COPY a second time and it loads **0 rows** — Snowflake remembers which files a table already consumed (64 days), making loads safely re-runnable.
