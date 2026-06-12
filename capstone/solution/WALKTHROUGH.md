@@ -2,7 +2,7 @@
 
 A beginner-friendly narrative of **what actually happens** when you run the solution: every command, what it does behind the scenes, what exists in Snowflake afterwards, and the numbers that prove each step worked. Read it side-by-side with running the steps.
 
-**The journey in one picture:**
+**The journey in one picture (10-second version):**
 
 ```
  you upload 3 CSVs          COPY INTO              dbt build
@@ -14,6 +14,66 @@ A beginner-friendly narrative of **what actually happens** when you run the solu
    (Bronze input)     └──────────────────┘      │  mart_customer_summary /        │
                          exactly as received    │  mart_product_performance (Gold)│
                                                 └─────────────────────────────────┘
+```
+
+**The same journey, zoomed in** — every arrow above hides a step. Here is the full flow with the gates, mechanics, and expected numbers; each numbered phase is a section of this document:
+
+```
+ PHASE 1 ── Snowsight: run snowflake_setup/01_setup_and_load.sql
+ ────────────────────────────────────────────────────────────────────────────
+   orders.csv   customers.csv   products.csv          (files on your laptop)
+        │
+        │  upload ("+ Files" in Snowsight)
+        ▼
+   @RAW.CSV_STAGE ............ the file "in-box": staged, but in NO table yet
+        │
+        │  COPY INTO ×3 — parsed via FILE FORMAT FF_CSV (skip header, ''→NULL)
+        │  (re-running loads 0 rows: Snowflake remembers files for 64 days)
+        ▼
+ ┌─ CAPSTONE_DB.RAW = Bronze (immutable, exactly as received) ──────────────┐
+ │  ORDERS     60   status still messy: 'COMPLETED' / 'Completed' / ...     │
+ │  CUSTOMERS  15   city & segment contain NULLs                            │
+ │  PRODUCTS   10   supplier_id contains a NULL                             │
+ └───────────────────────────────────────────────────────────────────────────┘
+
+ PHASE 2 ── terminal: dbt debug   (connection check only — builds nothing)
+
+ PHASE 3 ── terminal: dbt build   (parse refs → DAG → run in dependency order)
+ ────────────────────────────────────────────────────────────────────────────
+        │
+        │  🚧 GATE 1: source tests — unique + not_null on the 3 raw PKs
+        │             (bad input stops here, before anything is built)
+        ▼
+ ┌─ CAPSTONE_DB.ANALYTICS = Silver (cleaned & typed — dbt staging) ─────────┐
+ │  stg_customers  VIEW         15   segment NULL → 'unassigned'            │
+ │  stg_products   VIEW         10   supplier NULL → 'unknown'              │
+ │  stg_orders     INCREMENTAL  60   lower(trim(status)), gross_revenue     │
+ │                 1st run = full CREATE TABLE; later runs APPEND only      │
+ │                 rows where order_date > max already loaded  (task 36)    │
+ └───────────────────────────────────────────────────────────────────────────┘
+        │
+        │  🚧 GATE 2: 13 staging tests — PKs + accepted_values on status &
+        │             segment. ANY failure ⇒ marts are SKIPPED (fail-fast)
+        ▼
+ ┌─ CAPSTONE_DB.ANALYTICS = Gold (business-ready TABLEs — dbt marts) ───────┐
+ │  mart_daily_sales          60   revenue / orders / AOV per day           │
+ │  mart_customer_summary     15   LTV per customer; zero-order customers   │
+ │                                 kept by LEFT JOIN (total LTV ≈ 8,708.92) │
+ │  mart_product_performance  10   revenue / margin / below-cost units      │
+ │  every PK built by the surrogate_key() macro → expands to md5(...) at    │
+ │  compile time (see target/compiled/)                                     │
+ └───────────────────────────────────────────────────────────────────────────┘
+        │
+        │  🚧 GATE 3: mart tests — unique keys + relationships back to staging
+        ▼
+   ✅ dbt build summary: PASS=38   (6 models + 32 tests, one command)
+
+ PHASE 4 ── dbt docs generate && dbt docs serve → docs site + lineage graph
+
+ PHASE 5 ── the live demo loop:
+   INSERT new raw order ('COMPLETED', today) ─▶ dbt build ─▶ stg_orders gains
+   the is_incremental() filter and APPENDS just that row (cleaned to
+   'completed') ─▶ marts rebuild ─▶ new order visible in daily sales & LTV
 ```
 
 ---
