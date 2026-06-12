@@ -1,0 +1,67 @@
+# Task 42 — relationship tests between marts and staging models
+# Task 43 — descriptions feed the dbt docs site & lineage graph
+version: 2
+
+models:
+  - name: mart_daily_sales
+    description: >
+      Gold: one row per calendar day with completed-order revenue, order count,
+      and average order value; cancellations/returns counted separately.
+    columns:
+      - name: daily_sales_key
+        description: Surrogate key (md5 of sales_date) - task 41 macro.
+        tests:
+          - unique
+          - not_null
+      - name: sales_date
+        tests:
+          - unique
+          - not_null
+      - name: revenue
+        description: Sum of completed gross_revenue for the day.
+
+  - name: mart_customer_summary
+    description: >
+      Gold: one row per customer with lifetime value and order counts.
+      Customers with zero orders are kept (LTV 0).
+    columns:
+      - name: customer_key
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Natural key; must exist in stg_customers.
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: lifetime_value
+        description: Sum of completed order revenue, 0 for never-ordered customers.
+
+  - name: mart_product_performance
+    description: >
+      Gold: one row per product with units sold, revenue, absolute margin and
+      margin %. Negative margin flags products sold below cost.
+    columns:
+      - name: product_key
+        tests:
+          - unique
+          - not_null
+      - name: product_id
+        description: Natural key; must exist in stg_products.
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: margin
+        description: revenue - (units * cost_price); can legitimately be negative.
+      - name: below_cost_units
+        description: >
+          Units sold at a unit_price below cost_price. A product can be
+          profitable overall while still losing money on discounted lines.

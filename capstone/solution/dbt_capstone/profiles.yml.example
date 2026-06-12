@@ -1,0 +1,17 @@
+# Copy into ~/.dbt/profiles.yml (alongside any existing profiles).
+# NEVER commit real credentials.
+
+dbt_capstone:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: <orgname-accountname>
+      user: <your_username>
+      password: <your_password>
+      role: SYSADMIN                # or a dedicated TRANSFORMER role
+      warehouse: CAPSTONE_WH
+      database: CAPSTONE_DB
+      schema: ANALYTICS             # dbt builds Silver+Gold models here
+      threads: 4
+      query_tag: dbt_capstone

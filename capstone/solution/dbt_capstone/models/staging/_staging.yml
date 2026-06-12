@@ -1,0 +1,56 @@
+# Task 35 — generic tests: not_null, unique, accepted_values on status
+# Task 43 — descriptions feed the dbt docs site
+version: 2
+
+models:
+  - name: stg_orders
+    description: >
+      Silver-layer orders: typed, status normalized to lowercase, line revenue
+      precomputed. Incremental append by order_date (task 36).
+    columns:
+      - name: order_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+      - name: product_id
+        tests:
+          - not_null
+      - name: status
+        description: Normalized order status.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['completed', 'cancelled', 'returned']
+      - name: gross_revenue
+        description: quantity * unit_price for the line.
+
+  - name: stg_customers
+    description: Silver-layer customers; segment NULLs mapped to 'unassigned'.
+    columns:
+      - name: customer_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: segment
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['consumer', 'corporate', 'wholesale', 'unassigned']
+
+  - name: stg_products
+    description: Silver-layer product catalog; supplier NULLs mapped to 'unknown'.
+    columns:
+      - name: product_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: cost_price
+        tests:
+          - not_null

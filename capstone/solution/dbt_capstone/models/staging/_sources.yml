@@ -1,0 +1,30 @@
+# Task 32 — DBT sources pointing to the RAW schema tables
+version: 2
+
+sources:
+  - name: raw
+    description: CSV drops loaded via COPY INTO (see snowflake_setup/01_setup_and_load.sql).
+    database: CAPSTONE_DB
+    schema: RAW
+    tables:
+      - name: orders
+        description: One row per order line. Status casing is inconsistent at this layer.
+        columns:
+          - name: order_id
+            tests:
+              - unique
+              - not_null
+      - name: customers
+        description: One row per customer. city/segment contain NULLs.
+        columns:
+          - name: customer_id
+            tests:
+              - unique
+              - not_null
+      - name: products
+        description: Product catalog with cost prices. supplier_id contains NULLs.
+        columns:
+          - name: product_id
+            tests:
+              - unique
+              - not_null

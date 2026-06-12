@@ -97,3 +97,7 @@ A strong demo covers, in ~5 minutes:
 - Work in a **clean database** (e.g. `CAPSTONE_DB`) — rebuilding from zero is the real test of Days 1–5.
 - No UI-wizard loads (task 31 says COPY INTO), and all transformations in dbt — **Snowflake + DBT only**.
 - Commit everything (setup SQL + dbt project + README with run instructions) to a Git repo.
+
+### Reference solution
+
+A complete, verified implementation of tasks 31–44 lives in [`solution/`](solution/) — **attempt the capstone yourself first**; use it to compare your finished work or to unblock yourself after a genuine attempt.

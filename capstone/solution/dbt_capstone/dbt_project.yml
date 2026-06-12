@@ -1,0 +1,23 @@
+name: 'dbt_capstone'
+version: '1.0.0'
+config-version: 2
+
+profile: 'dbt_capstone'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  dbt_capstone:
+    staging:
+      # Silver layer: cleaned, typed views over RAW
+      # (stg_orders overrides this to incremental in its config block - task 36)
+      +materialized: view
+    marts:
+      # Gold layer: business-ready tables
+      +materialized: table
